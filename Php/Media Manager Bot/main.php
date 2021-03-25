@@ -874,7 +874,7 @@
                     $telegram->sendMessage($content);
                 }
                 else {
-                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "parse_mode" => "Markdown", "text" => "Currenlty the user with `".$text."` is not banned"];
+                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "parse_mode" => "Markdown", "text" => "Currenlty the user with `".$text."` id is not banned"];
                     $telegram->sendMessage($content);
                 }
             }
