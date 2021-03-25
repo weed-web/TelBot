@@ -24,6 +24,7 @@
     $result = $telegram->getData();
     $menu = [["Add Media", "Delete Media"], ["Total Videos", "Total Gifs", "Total Photos"], ["Total Users", "Ban User", "Unban User", "List Users"], ["Rename Caption", "Set Default Caption"], ["List Videos", "List Gifs", "List Photos", "Broadcast"]];
     if(isset($_GET['setWebhook'])) {echo file_get_contents("https://api.telegram.org/bot".$token."/setWebhook?url=https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);}
+    if(isset($_GET['deleteWebhook'])) {echo file_get_contents("https://api.telegram.org/bot".$token."/deleteWebhook");}
     if(!is_dir(dirname(__FILE__).'/files')){mkdir(dirname(__FILE__).'/files');}
     if(!file_exists(dirname(__FILE__).'/files/admin.json')){$admz = fopen(dirname(__FILE__).'/files/admin.json', 'w'); fclose($admz);}
     if(!file_exists(dirname(__FILE__).'/files/videos.json')){$vidz = fopen(dirname(__FILE__).'/files/videos.json', 'w'); fclose($vidz);}
@@ -936,48 +937,55 @@
     }
     else {
         $final = explode(" ", $text);
-        if($final[0] == "/start" and count($final) == 2) {
-            if(file_exists(dirname(__FILE__).'/files/videos.json') and file_exists(dirname(__FILE__)."/files/gifs.json") and file_exists(dirname(__FILE__)."/files/photos.json") and file_exists(dirname(__FILE__)."/files/default_caption.txt")) {
-                $lnk = explode("_", $final[1]);
-                $capt = file_get_contents(dirname(__FILE__).'/files/default_caption.txt');
-                if($lnk[0] == "V") {
-                    $vid_code = json_decode(file_get_contents(dirname(__FILE__)."/files/videos.json"), true);
-                    if(isset($vid_code[$final[1]])) {
-                        $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $vid_code[$final[1]]["caption"]."\n".$capt, "video" => $vid_code[$final[1]]];
-                        $telegram->sendVideo($content);
+        $users = json_decode(file_get_contents(dirname(__FILE__).'/files/users.json'), true);
+        if($users[$chat_id]["ban"] == 0) {
+            if($final[0] == "/start" and count($final) == 2) {
+                if(file_exists(dirname(__FILE__).'/files/videos.json') and file_exists(dirname(__FILE__)."/files/gifs.json") and file_exists(dirname(__FILE__)."/files/photos.json") and file_exists(dirname(__FILE__)."/files/default_caption.txt")) {
+                    $lnk = explode("_", $final[1]);
+                    $capt = file_get_contents(dirname(__FILE__).'/files/default_caption.txt');
+                    if($lnk[0] == "V") {
+                        $vid_code = json_decode(file_get_contents(dirname(__FILE__)."/files/videos.json"), true);
+                        if(isset($vid_code[$final[1]])) {
+                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $vid_code[$final[1]]["caption"]."\n".$capt, "video" => $vid_code[$final[1]]];
+                            $telegram->sendVideo($content);
+                        }
+                        else {
+                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "فایل یافت نشد!"];
+                            $telegram->sendMessage($content);
+                        }
+                    }
+                    elseif($lnk[0] == "G") {
+                        $gif_code = json_decode(file_get_contents(dirname(__FILE__)."/files/gifs.json"), true);
+                        if(isset($gif_code[$final[1]])) {
+                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $gif_code[$final[1]]["caption"]."\n".$capt, "animation" => $gif_code[$final[1]]];
+                            $telegram->sendAnimation($content);
+                        }
+                        else {
+                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "فایل یافت نشد!"];
+                            $telegram->sendMessage($content);
+                        }
+                    }
+                    elseif($lnk[0] == "P") {
+                        $pht_code = json_decode(file_get_contents(dirname(__FILE__).'/files/photos.json'), true);
+                        if(isset($pht_code[$final[1]])) {
+                            $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "caption" => $pht_code[$final[1]]["caption"]."\n".$capt, "photo" => $pht_code[$final[1]]["file_id"]];
+                            $telegram->sendPhoto($content);
+                        }
+                        else {
+                            $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "فایل یافت نشد!"];
+                            $telegram->sendMessage($content);
+                        }
                     }
                     else {
-                        $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "فایل یافت نشد!"];
+                        $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "لینک اشتباه است"];
                         $telegram->sendMessage($content);
                     }
-                }
-                elseif($lnk[0] == "G") {
-                    $gif_code = json_decode(file_get_contents(dirname(__FILE__)."/files/gifs.json"), true);
-                    if(isset($gif_code[$final[1]])) {
-                        $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $gif_code[$final[1]]["caption"]."\n".$capt, "animation" => $gif_code[$final[1]]];
-                        $telegram->sendAnimation($content);
-                    }
-                    else {
-                        $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "فایل یافت نشد!"];
-                        $telegram->sendMessage($content);
-                    }
-                }
-                elseif($lnk[0] == "P") {
-                    $pht_code = json_decode(file_get_contents(dirname(__FILE__).'/files/photos.json'), true);
-                    if(isset($pht_code[$final[1]])) {
-                        $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "caption" => $pht_code[$final[1]]["caption"]."\n".$capt, "photo" => $pht_code[$final[1]]["file_id"]];
-                        $telegram->sendPhoto($content);
-                    }
-                    else {
-                        $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "فایل یافت نشد!"];
-                        $telegram->sendMessage($content);
-                    }
-                }
-                else {
-                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "لینک اشتباه است"];
-                    $telegram->sendMessage($content);
                 }
             }
+        }
+        else {
+            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "شما از ربات بن شده‌اید!"];
+            $telegram->sendMessage($content);
         }
     }
 
