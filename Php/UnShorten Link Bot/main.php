@@ -2,8 +2,8 @@
 
     include("Telegram.php");
     date_default_timezone_set("Asia/Tehran");
-    $token = "";
-    $admin = [];
+    $token = "1111111:AAAAAABBBBBBBB_CCCCCCCCC"; # put your robot token here (remove example)
+    $admin = [111111, 222222]; # put your robot admins chatid here (remove examples)
     $telegram = new Telegram($token);
     $text = $telegram->Text();
     $chat_id = $telegram->ChatID();
@@ -18,7 +18,7 @@
     if(!file_exists(dirname(__FILE__).'/files/admin.json')){$admz = fopen(dirname(__FILE__).'/files/admin.json', 'w'); fclose($admz);}
     if(!file_exists(dirname(__FILE__).'/files/users.json')){$user = fopen(dirname(__FILE__).'/files/users.json', 'w'); fclose($user);}
     $users = json_decode(file_get_contents(dirname(__FILE__).'/files/users.json'), true);
-    if(is_null($users[strval($chat_id)])) {$users[$chat_id]["ban"] = 0; $chatz = fopen(dirname(__FILE__)."/files/users.json", "w"); fwrite($chatz, json_encode($users, JSON_PRETTY_PRINT)); fclose($chatz);}
+    if(is_null($users[strval($user_id)])) {$users[$user_id]["ban"] = 0; $chatz = fopen(dirname(__FILE__)."/files/users.json", "w"); fwrite($chatz, json_encode($users, JSON_PRETTY_PRINT)); fclose($chatz);}
     $admin_check = json_decode(file_get_contents(dirname(__FILE__).'/files/admin.json'), true);
     foreach((array)$admin as $sadmin) {if(is_null($admin_check[$sadmin])) {$flg = fopen(dirname(__FILE__).'/files/admin.json', 'w'); $admin_check[$sadmin] = array("Ban User" => 0, "Unban User" => 0, "Broadcast" => 0); fwrite($flg, json_encode($admin_check, JSON_PRETTY_PRINT)); fclose($flg);}}
     foreach((array)$admin_check as $wadmin => $key) {if(!in_array($wadmin, $admin)) {unset($admin_check[$wadmin]); unlink(dirname(__FILE__).'/files/admin.json'); $json = fopen(dirname(__FILE__).'/files/admin.json', 'w'); fwrite($json, json_encode($admin_check, JSON_PRETTY_PRINT)); fclose($json);}}
@@ -243,14 +243,13 @@
             }
         }
         else {
-            $file_headers = @get_headers($text);
-            if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
-                $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "Unvalid Link!"];
+            if(filter_var($text, FILTER_VALIDATE_URL) and validatelink($text) == true) {
+                $final_result = unshortenlink($text);
+                $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => $final_result, "disable_web_page_preview" => true];
                 $telegram->sendMessage($content);
             }
             else {
-                $final_result = ouo($text);
-                $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => $final_result, "disable_web_page_preview" => true];
+                $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "Unvalid Link!"];
                 $telegram->sendMessage($content);
             }
         }
@@ -263,14 +262,13 @@
                 $telegram->sendMessage($content);
             }
             elseif(!empty($text)) {
-                $file_headers = @get_headers($text);
-                if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
-                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "لینک ارسالی معتبر نیست!"];
+                if(filter_var($text, FILTER_VALIDATE_URL) and validatelink($text) == true) {
+                    $final_result = unshortenlink($text);
+                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => $final_result, "disable_web_page_preview" => true];
                     $telegram->sendMessage($content);
                 }
                 else {
-                    $final_result = ouo($text);
-                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => $final_result, "disable_web_page_preview" => true];
+                    $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "لینک ارسالی معتبر نیست!"];
                     $telegram->sendMessage($content);
                 }
             }
@@ -281,8 +279,24 @@
         }
     }
 
+    function validatelink($url) {$file_headers = @get_headers($url); if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {return false;} else {return true;}}
+    function unshortenlink($url) {
+        $service = explode("/", $url)[2];
+        switch ($service) {
+            case "ouo.io":
+                return ouo($url);
+                break;
+            case "ouo.press":
+                return ouo($ur);
+                break;
+            default:
+                return followredirections($url);
+                break;
+        }
+    }
     function getbetween($string, $start = '', $end = '') {if(strpos($string, $start)) {$startCharCount = strpos($string, $start) + strlen($start); $firstSubStr = substr($string, $startCharCount, strlen($string)); $endCharCount = strpos($firstSubStr, $end); if($endCharCount == 0) {$endCharCount = strlen($firstSubStr);} return substr($firstSubStr, 0, $endCharCount);} else {return '';}}
     function postrequest($url, $fields, $headers) {$ch = curl_init($url); curl_setopt($ch, CURLOPT_POST, true); curl_setopt($ch, CURLOPT_HEADER, true); curl_setopt($ch, CURLOPT_POSTFIELDS, $fields); curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); return curl_exec($ch);}
     function ouo($url) {$surl = explode("/", $url); $ch = curl_init($url); curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); curl_setopt($ch, CURLOPT_HEADER, true); $result = curl_exec($ch); $_token = getbetween($result, '<input name="_token" type="hidden" value="', '">'); $xtoken ='03AGdBq27aG8-DhLdx2leUYSAfc_LZN91MWJDmP0mJYMvIrB5Rs4qyT1OZOLxgod3XoK2GtcudVA8VEIBHycaVrh4lR1QBouZHMMNMKdTshSeKFQ-1ChyeMLNd2LAOcJnxta1lFMa0-oiBlqpfnP3TKuv11UfE5_12vWQC9Lyh5hyAdeODN4032yIc3kUuwMlaHac-p0CDaj4oa-NuRqi7TkxpUkdKo0rCDpRGN05VntnsZXMgQu-5Vj3ikwqsNfk7miziXwt9GgSQMLvGEkrBqRJuVLxy-ACOo5cvWTmTtB6snuDa8C_ZbJPhxQDiOb_6DK5j9bSDk0tC-OP0h7nCew_f9xLq75jFfxuGWl8AVdAKgHA60JoYwGqjIeH1wNaH8G5fRrjDs36zv91W4skgDAMZznw_9grLD9EjSvOy_pEL2jSUiVaKlCge6OxdvivK46xB-Dibu2RZ'; $vtoken = getbetween($result, '<input id="v-token" name="v-token" type="hidden" value="', '">'); $fields = '_token='.$_token.'&x-token='.$xtoken.'&v-token='.$vtoken; preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches); $cookies = array(); foreach($matches[1] as $item) {parse_str($item, $cookie); $cookies = array_merge($cookies, $cookie);} $headers = ['Host: '.$surl[2], 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0', 'Accept: text/html;q=0.5', 'Accept-Language: en-US,en;q=0.5', 'Content-Type: application/x-www-form-urlencoded', 'Origin: https://'.$surl[2], 'Connection: keep-alive', 'Referer: '.$url, 'Cookie: language='.$cookies['language'].'; __cfduid='.$cookies['__cfduid'].'; ouoio_session='.$cookies['ouoio_session'], 'Upgrade-Insecure-Requests: 1', 'Content-Length: '.strlen($fields)]; $cfduid = $cookies['__cfduid']; $result = postrequest('https://'.$surl[2].'/go/'.$surl[3], $fields, $headers); $fields = '_token='.$_token.'&x-token='; preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches); foreach($matches[1] as $item) {parse_str($item, $cookie); $cookies = array_merge($cookies, $cookie);} $headers = ['Host: '.$surl[2], 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0', 'Accept: text/html;q=0.5', 'Accept-Language: en-US,en;q=0.5', 'Content-Type: application/x-www-form-urlencoded', 'Origin: https://'.$surl[2], 'Connection: keep-alive', 'Referer: '.'https://'.$surl[2].'/go/'.$surl[3], 'Cookie: __cfduid='.$cfduid.'; ouoio_session='.$cookies['ouoio_session'].'; language='.$cookies['language'], 'Upgrade-Insecure-Requests: 1', 'Content-Length: '.strlen($fields)]; $result = postrequest('https://'.$surl[2].'/xreallcygo/'.$surl[3], $fields, $headers); return getbetween($result, '<title>Redirecting to ', '</title>');}
+    function followredirections($url) {$ch = curl_init($url); curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); curl_exec($ch); return curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);}
 
 ?>
