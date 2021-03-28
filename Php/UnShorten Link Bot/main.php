@@ -287,7 +287,7 @@
                 return ouo($url);
                 break;
             case "ouo.press":
-                return ouo($ur);
+                return ouo($url);
                 break;
             default:
                 return followredirections($url);
