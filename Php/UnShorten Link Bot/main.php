@@ -26,6 +26,14 @@
     if(in_array($user_id, $admin)) {
         $f = json_decode(file_get_contents(dirname(__FILE__).'/files/admin.json'), true);
         if($text == "/start") {
+            if($f[$chat_id]["Broadcast"] == 1 or $f[$chat_id]["Ban User"] == 1 or $f[$chat_id]["Unban User"] == 1) {
+                $f[$chat_id]["Broadcast"] = 0;
+                $f[$chat_id]["Ban User"] = 0;
+                $f[$chat_id]["Unban User"] = 0;
+                $file = fopen(dirname(__FILE__).'/files/admin.json', "w");
+                fwrite($file, json_encode($f, JSON_PRETTY_PRINT));
+                fclose($file);
+            }
             $btn = $telegram->buildKeyBoard($menu);
             $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "text" => "Welcome to Admin Panel !", "reply_markup" => $btn];
             $telegram->sendMessage($content);
