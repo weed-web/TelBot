@@ -958,7 +958,7 @@
                     if($lnk[0] == "V") {
                         $vid_code = json_decode(file_get_contents(dirname(__FILE__)."/files/videos.json"), true);
                         if(isset($vid_code[$final[1]])) {
-                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $vid_code[$final[1]]["caption"]."\n".$capt, "video" => $vid_code[$final[1]]];
+                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $vid_code[$final[1]]["caption"]."\n".$capt, "video" => $vid_code[$final[1]]["file_id"]];
                             $telegram->sendVideo($content);
                         }
                         else {
@@ -969,7 +969,7 @@
                     elseif($lnk[0] == "G") {
                         $gif_code = json_decode(file_get_contents(dirname(__FILE__)."/files/gifs.json"), true);
                         if(isset($gif_code[$final[1]])) {
-                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $gif_code[$final[1]]["caption"]."\n".$capt, "animation" => $gif_code[$final[1]]];
+                            $content = ["chat_id" => $chat_id, "reply_to_message_id" => $message_id, "caption" => $gif_code[$final[1]]["caption"]."\n".$capt, "animation" => $gif_code[$final[1]]["file_id"]];
                             $telegram->sendAnimation($content);
                         }
                         else {
