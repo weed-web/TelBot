@@ -4,6 +4,7 @@
     date_default_timezone_set("Asia/Tehran");
     $token = "1111111:AAAAAABBBBBBBB_CCCCCCCCC"; # put your robot token here (remove example)
     $admin = [111111, 222222]; # put your robot admins chatid here (remove examples)
+    $robot = "myrobot"; # put your robot id (remove examples)
     $telegram = new Telegram($token);
     $text = $telegram->Text();
     $chat_id = $telegram->ChatID();
@@ -257,7 +258,7 @@
                 $nums = count((array)$vidz_array);
                 $data = "Listing Saved Videos\n\n";
                 foreach((array)$vidz_array[0] as $key => $val) {
-                    $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                    $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                 }
                 $list = array(array($telegram->buildInlineKeyboardButton("<<","","vid_previous_1",""), $telegram->buildInlineKeyboardButton("Page 1","","page_vid_1",""), $telegram->buildInlineKeyboardButton(">>","","vid_next_1","")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                 $keyb = $telegram->buildInlineKeyBoard($list);
@@ -276,7 +277,7 @@
                 $nums = count((array)$vidz_array);
                 $data = "Listing Saved Gifs\n\n";
                 foreach((array)$vidz_array[0] as $key => $val) {
-                    $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                    $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                 }
                 $list = array(array($telegram->buildInlineKeyboardButton("<<","","gif_previous_1",""), $telegram->buildInlineKeyboardButton("Page 1","","page_gif_1",""), $telegram->buildInlineKeyboardButton(">>","","gif_next_1","")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                 $keyb = $telegram->buildInlineKeyBoard($list);
@@ -295,7 +296,7 @@
                 $nums = count((array)$vidz_array);
                 $data = "Listing Saved Photos\n\n";
                 foreach((array)$vidz_array[0] as $key => $val) {
-                    $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                    $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                 }
                 $list = array(array($telegram->buildInlineKeyboardButton("<<","","pht_previous_1",""), $telegram->buildInlineKeyboardButton("Page 1","","page_pht_1",""), $telegram->buildInlineKeyboardButton(">>","","pht_next_1","")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                 $keyb = $telegram->buildInlineKeyBoard($list);
@@ -339,7 +340,7 @@
                         $data = "Listing Saved Videos\n\n";
                         if((int)$clbk[2] >= $nums) {
                             foreach((array)$array[$nums-1] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","vid_previous_".$nums,""), $telegram->buildInlineKeyboardButton("Page ".$nums,"","page_vid_".$nums,""), $telegram->buildInlineKeyboardButton(">>","","vid_next_".$nums,"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -350,7 +351,7 @@
                         }
                         else {
                             foreach((array)$array[(int)$clbk[2]] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","vid_previous_".strval((int)$clbk[2]+1),""), $telegram->buildInlineKeyboardButton("Page ".strval((int)$clbk[2]+1),"","page_vid_".strval((int)$clbk[2]+1),""), $telegram->buildInlineKeyboardButton(">>","","vid_next_".strval((int)$clbk[2]+1),"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -362,7 +363,7 @@
                         $data = "Listing Saved Videos\n\n";
                         if((int)$clbk[2] <= 1) {
                             foreach((array)$array[0] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","vid_previous_1",""), $telegram->buildInlineKeyboardButton("Page 1","","page_vid_1",""), $telegram->buildInlineKeyboardButton(">>","","vid_next_1","")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -373,7 +374,7 @@
                         }
                         else {
                             foreach((array)$array[(int)$clbk[2]-2] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","vid_previous_".strval((int)$clbk[2]-1),""), $telegram->buildInlineKeyboardButton("Page ".strval((int)$clbk[2]-1),"","page_vid_".strval((int)$clbk[2]-1),""), $telegram->buildInlineKeyboardButton(">>","","vid_next_".strval((int)$clbk[2]-1),"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -396,7 +397,7 @@
                         $data = "Listing Saved Gifs\n\n";
                         if((int)$clbk[2] >= $nums) {
                             foreach((array)$array[$nums-1] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","gif_previous_".$nums,""), $telegram->buildInlineKeyboardButton("Page ".$nums,"","page_gif_".$nums,""), $telegram->buildInlineKeyboardButton(">>","","gif_next_".$nums,"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -407,7 +408,7 @@
                         }
                         else {
                             foreach((array)$array[(int)$clbk[2]] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","gif_previous_".strval((int)$clbk[2]+1),""), $telegram->buildInlineKeyboardButton("Page ".strval((int)$clbk[2]+1),"","page_gif_".strval((int)$clbk[2]+1),""), $telegram->buildInlineKeyboardButton(">>","","gif_next_".strval((int)$clbk[2]+1),"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -419,7 +420,7 @@
                         $data = "Listing Saved Gifs\n\n";
                         if((int)$clbk[2] <= 1) {
                             foreach((array)$array[0] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","gif_previous_1",""), $telegram->buildInlineKeyboardButton("Page 1","","page_gif_1",""), $telegram->buildInlineKeyboardButton(">>","","gif_next_1","")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -430,7 +431,7 @@
                         }
                         else {
                             foreach((array)$array[(int)$clbk[2]-2] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","vid_previous_".strval((int)$clbk[2]-1),""), $telegram->buildInlineKeyboardButton("Page ".strval((int)$clbk[2]-1),"","page_vid_".strval((int)$clbk[2]-1),""), $telegram->buildInlineKeyboardButton(">>","","vid_next_".strval((int)$clbk[2]-1),"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -453,7 +454,7 @@
                         $data = "Listing Saved Photos\n\n";
                         if((int)$clbk[2] >= $nums) {
                             foreach((array)$array[$nums-1] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","pht_previous_".$nums,""), $telegram->buildInlineKeyboardButton("Page ".$nums,"","page_pht_".$nums,""), $telegram->buildInlineKeyboardButton(">>","","pht_next_".$nums,"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -464,7 +465,7 @@
                         }
                         else {
                             foreach((array)$array[(int)$clbk[2]] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","pht_previous_".strval((int)$clbk[2]+1),""), $telegram->buildInlineKeyboardButton("Page ".strval((int)$clbk[2]+1),"","page_pht_".strval((int)$clbk[2]+1),""), $telegram->buildInlineKeyboardButton(">>","","pht_next_".strval((int)$clbk[2]+1),"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -476,7 +477,7 @@
                         $data = "Listing Saved Photos\n\n";
                         if((int)$clbk[2] <= 1) {
                             foreach((array)$array[0] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","pht_previous_1",""), $telegram->buildInlineKeyboardButton("Page 1","","page_pht_1",""), $telegram->buildInlineKeyboardButton(">>","","pht_next_1","")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -487,7 +488,7 @@
                         }
                         else {
                             foreach((array)$array[(int)$clbk[2]-2] as $key => $val) {
-                                $data = $data."File Link: "."<a href='t.me/VasayaBot?start=".$key."'>Click to see</a>\n\n";
+                                $data = $data."File Link: "."<a href='t.me/".$robot."?start=".$key."'>Click to see</a>\n\n";
                             }
                             $list = array(array($telegram->buildInlineKeyboardButton("<<","","pht_previous_".strval((int)$clbk[2]-1),""), $telegram->buildInlineKeyboardButton("Page ".strval((int)$clbk[2]-1),"","page_pht_".strval((int)$clbk[2]-1),""), $telegram->buildInlineKeyboardButton(">>","","pht_next_".strval((int)$clbk[2]-1),"")), array($telegram->buildInlineKeyboardButton("Close","","Close","")));
                             $keyb = $telegram->buildInlineKeyBoard($list);
@@ -601,11 +602,11 @@
                     $vidz_file = fopen(dirname(__FILE__).'/files/videos.json', 'a+');
                     fwrite($vidz_file, json_encode($vidz, JSON_PRETTY_PRINT));
                     fclose($vidz_file);
-                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File added to the database"."\n"."Accessing file with t.me/VasayaBot?start="."V_".$vid_uid." link"];
+                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File added to the database"."\n"."Accessing file with t.me/".$robot."?start="."V_".$vid_uid." link"];
                     $telegram->sendMessage($content);
                 }
                 else {
-                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File existed in the database"."\n"."Accessing file with t.me/VasayaBot?start=".$key." link"];
+                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File existed in the database"."\n"."Accessing file with t.me/".$robot."?start=".$key." link"];
                     $telegram->sendMessage($content);
                 }
             }
@@ -642,11 +643,11 @@
                     $gifz_file = fopen(dirname(__FILE__).'/files/gifs.json', 'a+');
                     fwrite($gifz_file, json_encode($gifz, JSON_PRETTY_PRINT));
                     fclose($gifz_file);
-                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File added to the database"."\n"."Accessing file with t.me/VasayaBot?start="."G_".$gif_uid." link"];
+                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File added to the database"."\n"."Accessing file with t.me/".$robot."?start="."G_".$gif_uid." link"];
                     $telegram->sendMessage($content);
                 }
                 else {
-                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File existed in the database"."\n"."Accessing file with t.me/VasayaBot?start=".$key." link"];
+                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File existed in the database"."\n"."Accessing file with t.me/".$robot."?start=".$key." link"];
                     $telegram->sendMessage($content);
                 }
             }
@@ -683,11 +684,11 @@
                     $phtz_file = fopen(dirname(__FILE__).'/files/photos.json', 'a+');
                     fwrite($phtz_file, json_encode($phtz, JSON_PRETTY_PRINT));
                     fclose($phtz_file);
-                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File added to the database"."\n"."Accessing file with t.me/VasayaBot?start="."P_".$pht_uid." link"];
+                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File added to the database"."\n"."Accessing file with t.me/".$robot."?start="."P_".$pht_uid." link"];
                     $telegram->sendMessage($content);
                 }
                 else {
-                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File existed in the database"."\n"."Accessing file with t.me/VasayaBot?start=".$key." link"];
+                    $content = ["chat_id" => $chat_id, 'reply_to_message_id' => $message_id, "text" => "File existed in the database"."\n"."Accessing file with t.me/".$robot."?start=".$key." link"];
                     $telegram->sendMessage($content);
                 }
             }
