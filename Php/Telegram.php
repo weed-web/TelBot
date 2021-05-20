@@ -6,27 +6,39 @@ if (file_exists('TelegramErrorLogger.php')) {
 
 class Telegram
 {
+    const INLINE_QUERY = 'inline_query';
     const CALLBACK_QUERY = 'callback_query';
     const EDITED_MESSAGE = 'edited_message';
+    const EDITED_CHANNEL_POST = 'edited_channel_post';
     const REPLY = 'reply';
     const MESSAGE = 'message';
+    const FORWARDED = 'forwarded';	
     const PHOTO = 'photo';
     const VIDEO = 'video';
     const AUDIO = 'audio';
     const VOICE = 'voice';
     const DOCUMENT = 'document';
+    const ANIMATION = 'animation';
+    const STICKER = 'sticker';	
     const LOCATION = 'location';
     const CONTACT = 'contact';
+    const DICE = 'dice';    
+    const NEW_CHAT_MEMBER = 'new_chat_member';
+    const LEFT_CHAT_MEMBER = 'left_chat_member';
     const CHANNEL_POST = 'channel_post';
 
     private $bot_token = '';
     private $data = [];
     private $updates = [];
+    private $log_errors;
+	private $proxy;
 
-    public function __construct($bot_token)
+    public function __construct($bot_token, $log_errors = true, array $proxy=array())
     {
         $this->bot_token = $bot_token;
         $this->data = $this->getData();
+        $this->log_errors = $log_errors;
+		$this->proxy = $proxy;
     }
 
     public function endpoint($api, array $content, $post = true)
@@ -58,6 +70,16 @@ class Telegram
         return $this->endpoint('sendMessage', $content);
     }
 
+	public function sendDice(array $content)
+    {
+        return $this->endpoint('sendDice', $content);
+    }
+
+    public function sendPoll(array $content)
+    {
+        return $this->endpoint('sendPoll', $content);
+    }	
+
     public function forwardMessage(array $content)
     {
         return $this->endpoint('forwardMessage', $content);
@@ -71,6 +93,11 @@ class Telegram
     public function sendAudio(array $content)
     {
         return $this->endpoint('sendAudio', $content);
+    }
+
+    public function sendAnimation(array $content)
+    {
+        return $this->endpoint('sendAnimation', $content);
     }
 
     public function sendDocument(array $content)
@@ -96,6 +123,31 @@ class Telegram
     public function sendLocation(array $content)
     {
         return $this->endpoint('sendLocation', $content);
+    }
+
+    public function editMessageLiveLocation(array $content)
+    {
+        return $this->endpoint('editMessageLiveLocation', $content);
+    }
+
+    public function stopMessageLiveLocation(array $content)
+    {
+        return $this->endpoint('stopMessageLiveLocation', $content);
+    }
+
+    public function setChatStickerSet(array $content)
+    {
+        return $this->endpoint('setChatStickerSet', $content);
+    }
+
+    public function deleteChatStickerSet(array $content)
+    {
+        return $this->endpoint('deleteChatStickerSet', $content);
+    }
+
+    public function sendMediaGroup(array $content)
+    {
+        return $this->endpoint('sendMediaGroup', $content);
     }
 
     public function sendVenue(array $content)
@@ -159,7 +211,7 @@ class Telegram
     {
         return $this->endpoint('getChatMember', $content);
     }
-
+	
     public function answerInlineQuery(array $content)
     {
         return $this->endpoint('answerInlineQuery', $content);
@@ -256,6 +308,16 @@ class Telegram
         return @$this->data['message']['caption'];
     }
 
+    public function Entities()
+    {
+        return @$this->data['message']['entities'];
+    }
+
+    public function ReplyMarkups()
+    {
+        return @$this->data['message']['reply_markup']['inline_keyboard'];
+    }	
+
     public function ChatID()
     {
         $type = $this->getUpdateType();
@@ -268,7 +330,9 @@ class Telegram
         if ($type == self::EDITED_MESSAGE) {
             return @$this->data['edited_message']['chat']['id'];
         }
-
+        if ($type == self::INLINE_QUERY) {
+            return @$this->data['inline_query']['from']['id'];
+        }
         return $this->data['message']['chat']['id'];
     }
 
@@ -284,7 +348,6 @@ class Telegram
         if ($type == self::EDITED_MESSAGE) {
             return @$this->data['edited_message']['message_id'];
         }
-
         return $this->data['message']['message_id'];
     }
 
@@ -293,7 +356,32 @@ class Telegram
         return $this->data['message']['reply_to_message']['message_id'];
     }
 
+    public function ReplyToMessageText()
+    {
+        return $this->data['message']['reply_to_message']['text'];
+    }
+
+    public function ReplyToMessageFromUsername()
+    {
+        return $this->data['message']['reply_to_message']['from']['username'];
+    }
+
+    public function ReplyToMessageFromUserFirstName()
+    {
+        return $this->data['message']['reply_to_message']['from']['first_name'];
+    }
+
+    public function ReplyToMessageFromUserLastName()
+    {
+        return $this->data['message']['reply_to_message']['from']['last_name'];
+    }	
+
     public function ReplyToMessageFromUserID()
+    {
+        return $this->data['message']['reply_to_message']['from']['id'];
+    }	
+
+    public function ReplyToMessageForwardFromUserID()
     {
         return $this->data['message']['reply_to_message']['forward_from']['id'];
     }
@@ -302,6 +390,16 @@ class Telegram
     {
         return $this->data['inline_query'];
     }
+
+	public function Inline_Query_ID()
+    {
+        return $this->data['inline_query']['id'];
+    }
+
+	public function Inline_Query_Text()
+    {
+        return $this->data['inline_query']['query'];
+    }	
 
     public function Callback_Query()
     {
@@ -345,7 +443,9 @@ class Telegram
         if ($type == self::EDITED_MESSAGE) {
             return @$this->data['edited_message']['from']['first_name'];
         }
-
+        if ($type == self::INLINE_QUERY) {
+            return @$this->data['inline_query']['from']['first_name'];
+        }		
         return @$this->data['message']['from']['first_name'];
     }
 
@@ -361,7 +461,9 @@ class Telegram
         if ($type == self::EDITED_MESSAGE) {
             return @$this->data['edited_message']['from']['last_name'];
         }
-
+        if ($type == self::INLINE_QUERY) {
+            return @$this->data['inline_query']['from']['last_name'];
+        }		
         return @$this->data['message']['from']['last_name'];
     }
 
@@ -377,9 +479,37 @@ class Telegram
         if ($type == self::EDITED_MESSAGE) {
             return @$this->data['edited_message']['from']['username'];
         }
-
+        if ($type == self::INLINE_QUERY) {
+            return @$this->data['inline_query']['from']['username'];
+        }
         return @$this->data['message']['from']['username'];
     }
+
+    public function IsBot()
+    {
+        $type = $this->getUpdateType();
+        if ($type == self::CALLBACK_QUERY) {
+            return @$this->data['callback_query']['from']['is_bot'];
+        }
+        if ($type == self::CHANNEL_POST) {
+            return @$this->data['channel_post']['from']['is_bot'];
+        }
+        if ($type == self::EDITED_MESSAGE) {
+            return @$this->data['edited_message']['from']['is_bot'];
+        }
+        if ($type == self::INLINE_QUERY) {
+            return @$this->data['inline_query']['from']['is_bot'];
+        }
+        if ($type == self::FORWARDED) {
+            return $this->data['message']['forward_from']['is_bot'];
+        }
+        return @$this->data['message']['from']['is_bot'];
+    }	
+
+    public function NewChatMember()
+    {
+        return $this->data['message']['new_chat_members'];
+    }	
 
     public function Location()
     {
@@ -396,6 +526,72 @@ class Telegram
         return count($this->updates['result']);
     }
 
+	public function GetPhotoId()
+	{
+        $update = $this->data;
+        if(isset($update["message"]["photo"])) {
+            return $this->data["message"]["photo"][count($this->data["message"]["photo"])-1]["file_id"];
+        }
+        else {
+            return NULL;
+        }
+	}
+
+	public function GetPhotoUid()
+	{
+        $update = $this->data;
+        if(isset($update["message"]["photo"])) {
+            return $this->data["message"]["photo"][count($this->data["message"]["photo"])-1]["file_unique_id"];
+        }
+        else {
+            return NULL;
+        }
+	}
+
+    public function GetGifzId()
+    {
+        $update = $this->data;
+        if(isset($update['message']['animation'])) {
+            return $this->data["message"]["animation"]["file_id"];
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    public function GetGifzUid()
+    {
+        $update = $this->data;
+        if(isset($update['message']['animation'])) {
+            return $this->data["message"]["animation"]["file_unique_id"];
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    public function GetVidzId()
+    {
+        $update = $this->data;
+        if(isset($update['message']['video'])) {
+            return $this->data["message"]["video"]["file_id"];
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    public function GetVidzUid()
+    {
+        $update = $this->data;
+        if(isset($update['message']['video'])) {
+            return $this->data["message"]["video"]["file_unique_id"];
+        }
+        else {
+            return NULL;
+        }
+    }
+
     public function UserID()
     {
         $type = $this->getUpdateType();
@@ -408,9 +604,116 @@ class Telegram
         if ($type == self::EDITED_MESSAGE) {
             return @$this->data['edited_message']['from']['id'];
         }
-
+        if ($type == self::INLINE_QUERY) {
+            return @$this->data['inline_query']['from']['id'];
+        }			
         return $this->data['message']['from']['id'];
     }
+
+	public function getContactPhoneNumber()
+	{
+		if ($this->getUpdateType() == 'contact')
+			return $this->data["message"]["contact"]["phone_number"];
+	}
+
+	public function getContactFirstName()
+	{
+		if ($this->getUpdateType() == 'contact')
+			return $this->data["message"]["contact"]["first_name"];
+	}	
+
+	public function Latitude()
+	{
+		if ($this->getUpdateType() == 'location')
+			return $this->data["message"]["location"]["latitude"];
+	}
+
+	public function Longitude()
+	{
+		if ($this->getUpdateType() == 'location')
+			return $this->data["message"]["location"]["longitude"];
+	}	
+
+	public function photoFileID()
+	{
+		if ($this->getUpdateType() == 'photo')
+			return $this->data["message"]["photo"][0]["file_id"];
+	}
+
+	public function smallPhotoFileID()
+	{
+		if ($this->getUpdateType() == 'photo')
+			return $this->data["message"]["photo"][0]["file_id"];
+	}
+
+	public function middlePhotoFileID()
+	{
+		if ($this->getUpdateType() == 'photo')
+			return $this->data["message"]["photo"][1]["file_id"];
+	}
+
+	public function bigPhotoFileID()
+	{
+		if ($this->getUpdateType() == 'photo')
+			return $this->data["message"]["photo"][2]["file_id"];
+	}
+
+	public function voiceFileID()
+	{
+		if ($this->getUpdateType() == 'voice')
+			return $this->data["message"]["voice"]["file_id"];
+	}
+
+	public function videoFileID()
+	{
+		if ($this->getUpdateType() == 'video')
+			return $this->data["message"]["video"]["file_id"];
+	}
+
+	public function audioFileID()
+	{
+		if ($this->getUpdateType() == 'audio')
+			return $this->data["message"]["audio"]["file_id"];
+	}
+
+	public function documentFileID()
+	{
+		if ($this->getUpdateType() == 'document')
+			return $this->data["message"]["document"]["file_id"];
+	}
+
+	public function documentMimeType()
+	{
+		if ($this->getUpdateType() == 'document')
+			return $this->data["message"]["document"]["mime_type"];
+	}
+
+	public function getDocumentMimeTypeExtension()
+	{
+		if ($this->getUpdateType() == 'document'){
+			$mime_type = $this->data["message"]["document"]["mime_type"];
+			if($mime_type == 'application/vnd.android.package-archive')
+				return 'apk';
+			elseif($mime_type == 'application/zip')
+				return 'zip';
+			elseif($mime_type == 'application/x-rar')
+				return 'rar';
+			elseif($mime_type == 'application/msword')
+				return 'doc';
+			elseif($mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+				return 'docx';
+			elseif($mime_type == 'application/vnd.ms-excel')
+				return 'xls';			
+			elseif($mime_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+				return 'xlsx';			
+			elseif($mime_type == 'application/javascript')
+				return 'js';			
+			elseif($mime_type == 'application/x-php')
+				return 'php';
+			elseif($mime_type == 'text/x-sql')
+				return 'sql';			
+		}
+	}	
 
     public function FromID()
     {
@@ -427,8 +730,12 @@ class Telegram
         if ($this->data['message']['chat']['type'] == 'private') {
             return false;
         }
-
         return true;
+    }
+    
+    public function getChatType()
+    {
+        return $this->data['message']['chat']['type'];
     }
 
     public function messageFromGroupTitle()
@@ -447,7 +754,6 @@ class Telegram
             'selective'         => $selective,
         ];
         $encodedMarkup = json_encode($replyMarkup, true);
-
         return $encodedMarkup;
     }
 
@@ -457,7 +763,6 @@ class Telegram
             'inline_keyboard' => $options,
         ];
         $encodedMarkup = json_encode($replyMarkup, true);
-
         return $encodedMarkup;
     }
 
@@ -479,7 +784,6 @@ class Telegram
         } elseif ($pay != '') {
             $replyMarkup['pay'] = $pay;
         }
-
         return $replyMarkup;
     }
 
@@ -490,7 +794,6 @@ class Telegram
             'request_contact'  => $request_contact,
             'request_location' => $request_location,
         ];
-
         return $replyMarkup;
     }
 
@@ -501,7 +804,6 @@ class Telegram
             'selective'       => $selective,
         ];
         $encodedMarkup = json_encode($replyMarkup, true);
-
         return $encodedMarkup;
     }
 
@@ -512,7 +814,6 @@ class Telegram
             'selective'   => $selective,
         ];
         $encodedMarkup = json_encode($replyMarkup, true);
-
         return $encodedMarkup;
     }
 
@@ -548,7 +849,7 @@ class Telegram
 
     public function exportChatInviteLink(array $content)
     {
-        return $this->endpoint('exportChatInviteLink', $content);
+        return $this->endpoint('exportChatInviteLink', $content)["result"];
     }
 
     public function setChatPhoto(array $content)
@@ -570,6 +871,11 @@ class Telegram
     {
         return $this->endpoint('setChatDescription', $content);
     }
+	
+    public function setChatAdministratorCustomTitle(array $content)
+    {
+        return $this->endpoint('setChatDescription', $content);
+    }	
 
     public function pinChatMessage(array $content)
     {
@@ -627,7 +933,6 @@ class Telegram
                 $this->endpoint('getUpdates', $content);
             }
         }
-
         return $this->updates;
     }
 
@@ -636,17 +941,51 @@ class Telegram
         $this->data = $this->updates['result'][$update];
     }
 
+    function getDiceValue(){
+        return $this->data['message']['dice']['value'];
+    }
+
     public function getUpdateType()
     {
         $update = $this->data;
+        if (isset($update['inline_query'])) {
+            return self::INLINE_QUERY;
+        }
         if (isset($update['callback_query'])) {
             return self::CALLBACK_QUERY;
         }
-        if (isset($update['edited_message'])) {
+        if (isset($update['message']['reply_to_message'])) {
+			if(isset($update['message']['animation']))
+				return self::ANIMATION;
+			elseif(isset($update['message']['document']))
+				return self::DOCUMENT;
+			elseif(isset($update['message']['sticker']))
+				return self::STICKER;
+			elseif(isset($update['message']['photo']))
+				return self::PHOTO;
+			elseif(isset($update['message']['video']))
+				return self::VIDEO;
+			elseif(isset($update['message']['audio']))
+				return self::AUDIO;
+			elseif(isset($update['message']['voice']))
+				return self::VOICE;
+            else
+				return self::REPLY;
+        }		
+        if (isset($update['edited_channel_post'])) {
+            return self::EDITED_CHANNEL_POST;
+        }
+		if (isset($update['edited_message'])) {
             return self::EDITED_MESSAGE;
         }
-        if (isset($update['message']['reply_to_message'])) {
-            return self::REPLY;
+        if (isset($update['message']['forward_from']) || isset($update['message']['forward_from_chat'])) {
+            return self::FORWARDED;
+        }
+        if (isset($update['message']['new_chat_members'])) {
+            return self::NEW_CHAT_MEMBER;
+        }
+        if (isset($update['message']['left_chat_member'])) {
+            return self::LEFT_CHAT_MEMBER;
         }
         if (isset($update['message']['text'])) {
             return self::MESSAGE;
@@ -666,16 +1005,24 @@ class Telegram
         if (isset($update['message']['contact'])) {
             return self::CONTACT;
         }
-        if (isset($update['message']['document'])) {
-            return self::DOCUMENT;
-        }
         if (isset($update['message']['location'])) {
             return self::LOCATION;
+        }
+        if (isset($update['message']['document'])) {
+            return self::DOCUMENT;
+		}
+        if (isset($update['message']['animation'])) {
+            return self::ANIMATION;
+        }
+		if (isset($update['message']['sticker'])) {
+            return self::STICKER;
         }
         if (isset($update['channel_post'])) {
             return self::CHANNEL_POST;
         }
-
+        if (isset($update['message']['dice'])) {
+            return self::DICE;
+        }
         return false;
     }
 
@@ -693,17 +1040,40 @@ class Telegram
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
         }
+		echo "inside curl if";
+		if (!empty($this->proxy)) {
+			echo "inside proxy if";
+			if (array_key_exists("type", $this->proxy)) {
+				curl_setopt($ch, CURLOPT_PROXYTYPE, $this->proxy["type"]);
+			}
+			
+			if (array_key_exists("auth", $this->proxy)) {
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy["auth"]);
+			}
+			
+			if (array_key_exists("url", $this->proxy)) {
+				echo "Proxy Url";
+				curl_setopt($ch, CURLOPT_PROXY, $this->proxy["url"]);
+			}
+			
+			if (array_key_exists("port", $this->proxy)) {
+				echo "Proxy port";
+				curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxy["port"]);
+			}
+		}
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $result = curl_exec($ch);
         if ($result === false) {
             $result = json_encode(['ok'=>false, 'curl_error_code' => curl_errno($ch), 'curl_error' => curl_error($ch)]);
         }
+		echo $result;
         curl_close($ch);
-        if (class_exists('TelegramErrorLogger')) {
-            $loggerArray = ($this->getData() == null) ? [$content] : [$this->getData(), $content];
-            TelegramErrorLogger::log(json_decode($result, true), $loggerArray);
+        if ($this->log_errors) {
+            if (class_exists('TelegramErrorLogger')) {
+                $loggerArray = ($this->getData() == null) ? [$content] : [$this->getData(), $content];
+                TelegramErrorLogger::log(json_decode($result, true), $loggerArray);
+            }
         }
-
         return $result;
     }
 }
